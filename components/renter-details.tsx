@@ -9,7 +9,6 @@ import { Star, Mail, Briefcase, Calendar, Shield, AlertCircle, UserPlus, MapPin,
 import { getFirstRenterId, getRenterDetails, getCalificaciones } from "@/lib/api"
 import type { RenterDetailsType, Review } from "@/lib/types"
 import RenterReviews from "./renter-reviews"
-import AddReviewForm from "./add-review-form"
 import { ToastProvider, ToastViewport } from "@/components/ui/toast"
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
@@ -47,7 +46,8 @@ export default function RenterDetails({ renterId }: RenterDetailsProps) {
         const calificaciones = await getCalificaciones(finalRenterId)
         if (calificaciones.length > 0) {
           const sum = calificaciones.reduce(
-            (acc, c) => acc + (c.comportamiento + c.cuidadoVehiculo + c.puntualidad) / 3,
+            (acc: number, c: { comportamiento: number; cuidadoVehiculo: number; puntualidad: number }) => 
+              acc + (c.comportamiento + c.cuidadoVehiculo + c.puntualidad) / 3,
             0
           )
           setRating(sum / calificaciones.length)
@@ -272,9 +272,6 @@ export default function RenterDetails({ renterId }: RenterDetailsProps) {
 
             <TabsContent value="reviews">
               <div className="grid gap-6">
-                {/* Add Review Form */}
-                <AddReviewForm renterId={renterDetails.id} onReviewAdded={handleReviewAdded} />
-
                 {/* Reviews List */}
                 <Card>
                   <CardHeader>

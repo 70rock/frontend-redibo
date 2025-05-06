@@ -92,12 +92,13 @@ export function Tasklist({ hostId }: TasklistUsuario) {
 
         // Extraer renters únicos de las rentas
         const uniqueRenters = rentalsData.reduce((acc: Renter[], rental: Rental) => {
+          const existingCalificacion = calificacionesMapeadas.find(c => c.reservaId === rental.id);
           if (!acc.find(r => r.id === rental.renter.id && r.idReserva === rental.id)) {
             acc.push({
               ...rental.renter,
               idReserva: rental.id,
               fechaFin: rental.fechaFin,
-              rated: calificaciones.some(c => c.reservaId === rental.id)
+              rated: !!existingCalificacion
             })
           }
           return acc
@@ -178,19 +179,21 @@ export function Tasklist({ hostId }: TasklistUsuario) {
 
       let response
       if (existingRating) {
-        response = await fetch(`/api/calificaciones/${existingRating.id}`, {
+        response = await fetch(`http://localhost:4000/api/calificaciones/${existingRating.id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: 'include',
           body: JSON.stringify(ratingData),
         })
       } else {
-        response = await fetch("/api/calificaciones", {
+        response = await fetch("http://localhost:4000/api/calificaciones", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: 'include',
           body: JSON.stringify(ratingData),
         })
       }
@@ -253,8 +256,9 @@ export function Tasklist({ hostId }: TasklistUsuario) {
         throw new Error("No se encontró la calificación")
       }
 
-      const response = await fetch(`/api/calificaciones/${calificacion.id}`, {
+      const response = await fetch(`http://localhost:4000/api/calificaciones/${calificacion.id}`, {
         method: "DELETE",
+        credentials: 'include'
       })
 
       if (!response.ok) {

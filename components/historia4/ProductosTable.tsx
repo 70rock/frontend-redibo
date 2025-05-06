@@ -71,7 +71,7 @@ export function ProductosTable({ hostId }: ProductosTableProps) {
   }
 
   const getSortedReservations = () => {
-    // Convertir las fechas a objetos Date para comparación
+    
     return [...reservations].sort((a, b) => {
       if (!sortConfig.key) return 0
 

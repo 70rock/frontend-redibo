@@ -4,7 +4,7 @@ import type React from "react"
 
 import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { login, getProfile, logout } from "@/lib/api"
+import { login, getProfile, logout, register } from "@/lib/api"
 
 type User = {
   id: string
@@ -76,18 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true)
     setError(null)
     try {
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, name }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`)
-      }
-
-      const data = await response.json()
+      const data = await register(email, password, name)
       setUser(data.user)
       router.push("/")
     } catch (error: any) {

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
-import { createClient } from "@/lib/supabase-browser"
+import { register } from "@/lib/api"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 const formSchema = z
@@ -31,7 +31,6 @@ export function RegisterForm() {
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
-  const supabase = createClient()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -50,42 +49,7 @@ export function RegisterForm() {
     try {
       console.log("Attempting to register with email:", values.email)
 
-      const { data, error } = await supabase.auth.signUp({
-        email: values.email,
-        password: values.password,
-        options: {
-          data: {
-            full_name: values.fullName,
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
-      })
-
-      if (error) {
-        console.error("Supabase signup error:", error)
-
-        if (error.message.includes("Email address") && error.message.includes("invalid")) {
-          setServerError("El formato del correo electrónico no es válido o no está permitido por el servidor")
-        } else if (error.message.includes("already registered") || error.message.includes("already in use")) {
-          setServerError("Este correo electrónico ya está registrado")
-        } else {
-          setServerError(error.message)
-        }
-
-        throw error
-      }
-
-      if (data?.user) {
-        const { error: profileError } = await supabase.from("profiles").upsert({
-          id: data.user.id,
-          full_name: values.fullName,
-          updated_at: new Date().toISOString(),
-        })
-
-        if (profileError) {
-          console.error("Error updating profile:", profileError)
-        }
-      }
+      await register(values.email, values.password, values.fullName)
 
       toast({
         title: "Registro exitoso",
