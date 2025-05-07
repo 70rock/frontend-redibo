@@ -23,6 +23,9 @@ export default function RenterReviews({ reviews }: RenterReviewsProps) {
   const [showFilters, setShowFilters] = useState(false)
   const initialReviewsCount = 2
 
+  console.log("reviews recibidas:", reviews);
+  console.log("calificador recibido:", null);
+
   const filteredAndSortedReviews = useMemo(() => {
     let filtered = [...reviews]
     if (ratingFilter !== "all") {
@@ -31,8 +34,8 @@ export default function RenterReviews({ reviews }: RenterReviewsProps) {
     }
 
     return filtered.sort((a, b) => {
-      const dateA = new Date(a.created_at).getTime()
-      const dateB = new Date(b.created_at).getTime()
+      const dateA = new Date(a.createdAt).getTime()
+      const dateB = new Date(b.createdAt).getTime()
       return sortOrder === "newest" ? dateB - dateA : dateA - dateB
     })
   }, [reviews, ratingFilter, sortOrder])
@@ -145,34 +148,44 @@ export default function RenterReviews({ reviews }: RenterReviewsProps) {
         </div>
       ) : (
         <>
-          {displayedReviews.map((review, index) => (
-            <div key={review.id || index}>
-              <div className="flex items-start gap-4">
-                <Avatar>
-                  <AvatarImage src={review.host_picture || "/placeholder.svg"} alt={review.host_name || "Anfitrión"} />
-                  <AvatarFallback>
-                    {review.host_name && review.host_name.length > 0 ? review.host_name.charAt(0) : "A"}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-medium">{review.host_name || "Anfitrión"}</h4>
-                    <span className="text-sm text-muted-foreground">{review.date || review.created_at}</span>
+          {displayedReviews.map((review, index) => {
+            // Usar rating como valor de estrellas
+            const promedio = review.rating || 0;
+
+            return (
+              <div key={review.id || index}>
+                <div className="flex items-start gap-4">
+                  <Avatar>
+                    <AvatarImage src={review.hostPicture || "/placeholder.svg"} alt={review.hostName || "Anfitrión"} />
+                    <AvatarFallback>
+                      {review.hostName && review.hostName.length > 0 ? review.hostName.charAt(0) : "A"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium">{review.hostName || "Anfitrión"}</h4>
+                      <span className="text-sm text-muted-foreground">
+                        {review.createdAt
+                          ? new Date(review.createdAt).toLocaleDateString()
+                          : ""}
+                      </span>
+                    </div>
+                    <div className="flex items-center mt-1 mb-2">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-4 w-4 ${i < Math.round(promedio) ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`}
+                        />
+                      ))}
+                      <span className="ml-2 text-xs text-muted-foreground">({promedio.toFixed(1)})</span>
+                    </div>
+                    <p className="text-sm">{review.comment || "Sin comentarios"}</p>
                   </div>
-                  <div className="flex items-center mt-1 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-4 w-4 ${i < (review.rating || 0) ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`}
-                      />
-                    ))}
-                  </div>
-                  <p className="text-sm">{review.comment || "Sin comentarios"}</p>
                 </div>
+                {index < displayedReviews.length - 1 && <Separator className="my-4" />}
               </div>
-              {index < displayedReviews.length - 1 && <Separator className="my-4" />}
-            </div>
-          ))}
+            );
+          })}
 
           {/* Botón Ver más */}
           {hasMoreReviews && (
