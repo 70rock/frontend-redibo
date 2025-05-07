@@ -151,6 +151,12 @@ export default function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link href="/dashboard">
+                    <Star className="mr-2 h-4 w-4" />
+                    <span>Ver todos los comentarios</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link href="/reservaciones" className="w-full cursor-pointer">
                     <Calendar className="mr-2 h-4 w-4" />
                     <span>Actividad de Automovil</span>
