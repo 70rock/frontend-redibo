@@ -237,7 +237,7 @@ export default function ComentariosPage() {
               <SelectContent>
                 <SelectItem value="fecha">Fecha</SelectItem>
                 <SelectItem value="calificacion">Calificación</SelectItem>
-                <SelectItem value="alfabetico">A/Z</SelectItem>
+
               </SelectContent>
             </Select>
           </div>
@@ -268,7 +268,7 @@ export default function ComentariosPage() {
             </div>
           </div>
 
-          <Button onClick={applyFilters}>Aplicar filtros</Button>
+           //<Button onClick={applyFilters}>Aplicar filtros</Button>
         </div>
 
         <div className="space-y-4 mb-6">
