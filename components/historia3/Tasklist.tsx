@@ -141,7 +141,7 @@ export function Tasklist({ hostId }: TasklistUsuario) {
         }))
         setCalificaciones(calificacionesMapeadas)
 
-        // Extraer renters únicos de las rentas
+        
         const uniqueRenters = rentalsData.reduce((acc: Renter[], rental: Rental) => {
           const existingCalificacion = calificacionesMapeadas.find(c => c.reservaId === rental.id);
           const carImage = rental.car?.imagenes?.[0]?.url || "/placeholder_car.svg";
@@ -171,20 +171,19 @@ export function Tasklist({ hostId }: TasklistUsuario) {
   function estaDentroDePeriodoCalificacion(fechaFin: string): boolean {
     const fechaFinRenta = new Date(fechaFin)
     const fechaActual = new Date()
-    // Resetear las horas, minutos y segundos para comparar solo fechas
+   
     fechaFinRenta.setHours(0, 0, 0, 0)
     fechaActual.setHours(0, 0, 0, 0)
-    // Calcular la diferencia en días
+    
     const diferenciaTiempo = fechaActual.getTime() - fechaFinRenta.getTime()
     const diferenciaDias = Math.floor(diferenciaTiempo / (1000 * 3600 * 24))
-    // Permitir calificar si no han pasado más de 2 días
+    
     return diferenciaDias <= 2
   }
 
-  // Modificar la función handleSeleccionar para que no permita seleccionar rentas fuera de plazo
+  
   function handleSeleccionar(renter: Renter) {
-    // Si ya está calificado, siempre permitir ver la calificación
-    // Si no está calificado, solo permitir seleccionar si está dentro del período
+    
     if (renter.rated || estaDentroDePeriodoCalificacion(renter.fechaFin?.toString() || "")) {
       const calificacion = calificaciones.find((c) => c.reservaId === renter.idReserva)
       if (calificacion) {
@@ -206,7 +205,7 @@ export function Tasklist({ hostId }: TasklistUsuario) {
       setSelected(renter)
       setShowRatingPanel(true)
     }
-    // No hacemos nada si está fuera de plazo y no tiene calificación
+    
   }
 
   async function handleGuardar() {
@@ -219,7 +218,7 @@ export function Tasklist({ hostId }: TasklistUsuario) {
     try {
       const ratingGeneral = Math.round((rating.comportamiento + rating.cuidadoVehiculo + rating.puntualidad) / 3)
 
-      // Filtrar el comentario para eliminar palabras inapropiadas
+      
       const comentarioLimpio = leoProfanity.clean(rating.comentario)
 
       const ratingData = {
@@ -264,7 +263,7 @@ export function Tasklist({ hostId }: TasklistUsuario) {
 
       const updatedRating = await response.json()
 
-      // Actualizar estado local
+      
       if (updatedRating) {
         setCalificaciones((prev) =>
           existingRating
