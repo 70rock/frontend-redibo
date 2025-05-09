@@ -367,4 +367,8 @@ export default function ComentariosPage() {
       </div>
     </>
   )
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 95281ef808c427059d01109af9c1c7749de050fe

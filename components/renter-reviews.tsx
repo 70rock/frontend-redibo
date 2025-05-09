@@ -16,6 +16,7 @@ interface RenterReviewsProps {
 type SortOrder = "newest" | "oldest"
 type RatingFilter = "all" | "5" | "4" | "3" | "2" | "1"
 
+<<<<<<< HEAD
 function tiempoTranscurrido(fecha: string | Date) {
   const ahora = new Date();
   const fechaResena = new Date(fecha);
@@ -29,13 +30,18 @@ function tiempoTranscurrido(fecha: string | Date) {
   return fechaResena.toLocaleDateString();
 }
 
+=======
+>>>>>>> 95281ef808c427059d01109af9c1c7749de050fe
 export default function RenterReviews({ reviews }: RenterReviewsProps) {
   const [expanded, setExpanded] = useState(false)
   const [sortOrder, setSortOrder] = useState<SortOrder>("newest")
   const [ratingFilter, setRatingFilter] = useState<RatingFilter>("all")
   const [showFilters, setShowFilters] = useState(false)
   const initialReviewsCount = 2
+<<<<<<< HEAD
   const [expandedComment, setExpandedComment] = useState<number | null>(null)
+=======
+>>>>>>> 95281ef808c427059d01109af9c1c7749de050fe
 
   console.log("reviews recibidas:", reviews);
   console.log("calificador recibido:", null);
@@ -165,9 +171,12 @@ export default function RenterReviews({ reviews }: RenterReviewsProps) {
           {displayedReviews.map((review, index) => {
             // Usar rating como valor de estrellas
             const promedio = review.rating || 0;
+<<<<<<< HEAD
             const comentarioTexto = review.comment || "";
             const comentarioLargo = comentarioTexto.length > 120;
             const mostrarExpandido = expandedComment === index;
+=======
+>>>>>>> 95281ef808c427059d01109af9c1c7749de050fe
 
             return (
               <div key={review.id || index}>
@@ -183,7 +192,11 @@ export default function RenterReviews({ reviews }: RenterReviewsProps) {
                       <h4 className="font-medium">{review.hostName || "Anfitrión"}</h4>
                       <span className="text-sm text-muted-foreground">
                         {review.createdAt
+<<<<<<< HEAD
                           ? tiempoTranscurrido(review.createdAt)
+=======
+                          ? new Date(review.createdAt).toLocaleDateString()
+>>>>>>> 95281ef808c427059d01109af9c1c7749de050fe
                           : ""}
                       </span>
                     </div>
@@ -196,6 +209,7 @@ export default function RenterReviews({ reviews }: RenterReviewsProps) {
                       ))}
                       <span className="ml-2 text-xs text-muted-foreground">({promedio.toFixed(1)})</span>
                     </div>
+<<<<<<< HEAD
                     <p
                       className="text-sm cursor-pointer select-none"
                       onClick={() => setExpandedComment(mostrarExpandido ? null : index)}
@@ -205,6 +219,9 @@ export default function RenterReviews({ reviews }: RenterReviewsProps) {
                         ? `${comentarioTexto.slice(0, 120)}...`
                         : comentarioTexto || "Sin comentarios"}
                     </p>
+=======
+                    <p className="text-sm">{review.comment || "Sin comentarios"}</p>
+>>>>>>> 95281ef808c427059d01109af9c1c7749de050fe
                   </div>
                 </div>
                 {index < displayedReviews.length - 1 && <Separator className="my-4" />}

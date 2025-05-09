@@ -165,7 +165,10 @@ export function getCarComments(carId: string) {
 export function createCarComment(commentData: any) {
   return api.post("/api/car-comments", commentData)
 }
+<<<<<<< HEAD
 
 export function createReport(reportData: any) {
   return api.post("/api/reports", reportData);
 }
+=======
+>>>>>>> 95281ef808c427059d01109af9c1c7749de050fe
