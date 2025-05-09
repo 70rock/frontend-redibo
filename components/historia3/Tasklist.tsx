@@ -106,10 +106,7 @@ export function Tasklist({ hostId }: TasklistUsuario) {
   const [isLoading, setIsLoading] = useState(true)
   const [showRatingPanel, setShowRatingPanel] = useState(false)
   const [error, setError] = useState<string | null>(null)
-<<<<<<< HEAD
   const [comentarioOfensivo, setComentarioOfensivo] = useState(false)
-=======
->>>>>>> 95281ef808c427059d01109af9c1c7749de050fe
 
   useEffect(() => {
     async function fetchData() {
@@ -144,11 +141,7 @@ export function Tasklist({ hostId }: TasklistUsuario) {
         }))
         setCalificaciones(calificacionesMapeadas)
 
-<<<<<<< HEAD
         
-=======
-        // Extraer renters únicos de las rentas
->>>>>>> 95281ef808c427059d01109af9c1c7749de050fe
         const uniqueRenters = rentalsData.reduce((acc: Renter[], rental: Rental) => {
           const existingCalificacion = calificacionesMapeadas.find(c => c.reservaId === rental.id);
           const carImage = rental.car?.imagenes?.[0]?.url || "/placeholder_car.svg";
@@ -178,7 +171,6 @@ export function Tasklist({ hostId }: TasklistUsuario) {
   function estaDentroDePeriodoCalificacion(fechaFin: string): boolean {
     const fechaFinRenta = new Date(fechaFin)
     const fechaActual = new Date()
-<<<<<<< HEAD
    
     fechaFinRenta.setHours(0, 0, 0, 0)
     fechaActual.setHours(0, 0, 0, 0)
@@ -192,22 +184,6 @@ export function Tasklist({ hostId }: TasklistUsuario) {
   
   function handleSeleccionar(renter: Renter) {
     
-=======
-    // Resetear las horas, minutos y segundos para comparar solo fechas
-    fechaFinRenta.setHours(0, 0, 0, 0)
-    fechaActual.setHours(0, 0, 0, 0)
-    // Calcular la diferencia en días
-    const diferenciaTiempo = fechaActual.getTime() - fechaFinRenta.getTime()
-    const diferenciaDias = Math.floor(diferenciaTiempo / (1000 * 3600 * 24))
-    // Permitir calificar si no han pasado más de 2 días
-    return diferenciaDias <= 2
-  }
-
-  // Modificar la función handleSeleccionar para que no permita seleccionar rentas fuera de plazo
-  function handleSeleccionar(renter: Renter) {
-    // Si ya está calificado, siempre permitir ver la calificación
-    // Si no está calificado, solo permitir seleccionar si está dentro del período
->>>>>>> 95281ef808c427059d01109af9c1c7749de050fe
     if (renter.rated || estaDentroDePeriodoCalificacion(renter.fechaFin?.toString() || "")) {
       const calificacion = calificaciones.find((c) => c.reservaId === renter.idReserva)
       if (calificacion) {
@@ -229,11 +205,7 @@ export function Tasklist({ hostId }: TasklistUsuario) {
       setSelected(renter)
       setShowRatingPanel(true)
     }
-<<<<<<< HEAD
     
-=======
-    // No hacemos nada si está fuera de plazo y no tiene calificación
->>>>>>> 95281ef808c427059d01109af9c1c7749de050fe
   }
 
   async function handleGuardar() {
@@ -246,11 +218,7 @@ export function Tasklist({ hostId }: TasklistUsuario) {
     try {
       const ratingGeneral = Math.round((rating.comportamiento + rating.cuidadoVehiculo + rating.puntualidad) / 3)
 
-<<<<<<< HEAD
       
-=======
-      // Filtrar el comentario para eliminar palabras inapropiadas
->>>>>>> 95281ef808c427059d01109af9c1c7749de050fe
       const comentarioLimpio = leoProfanity.clean(rating.comentario)
 
       const ratingData = {
@@ -295,11 +263,7 @@ export function Tasklist({ hostId }: TasklistUsuario) {
 
       const updatedRating = await response.json()
 
-<<<<<<< HEAD
       
-=======
-      // Actualizar estado local
->>>>>>> 95281ef808c427059d01109af9c1c7749de050fe
       if (updatedRating) {
         setCalificaciones((prev) =>
           existingRating
@@ -473,11 +437,7 @@ export function Tasklist({ hostId }: TasklistUsuario) {
                               <img
                                 src={renter.profilePicture || "/placeholder.svg"}
                                 alt={`${renter.firstName} ${renter.lastName}`}
-<<<<<<< HEAD
                                 style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover" }}
-=======
-                                style={{ width: 40, height: 40, borderRadius: "50%" }}
->>>>>>> 95281ef808c427059d01109af9c1c7749de050fe
                               />
                             </div>
                             <div className="rental-user-info">
@@ -742,7 +702,6 @@ export function Tasklist({ hostId }: TasklistUsuario) {
                         placeholder="Añade un comentario general sobre tu experiencia con este arrendatario..."
                         value={rating.comentario}
                         onChange={(e) => {
-<<<<<<< HEAD
                           const value = e.target.value;
                           setRating((prev) => ({ ...prev, comentario: value }))
                           setComentarioOfensivo(!!value && value !== leoProfanity.clean(value));
@@ -750,14 +709,6 @@ export function Tasklist({ hostId }: TasklistUsuario) {
                         disabled={selected.rated && !estaDentroDePeriodoCalificacion(selected.fechaFin?.toString() || "")}
                         rows={4}
                         maxLength={500} // <- Nuevo límite superior
-=======
-                          console.log("Comentario actualizado:", e.target.value)
-                          setRating((prev) => ({ ...prev, comentario: e.target.value }))
-                        }}
-                        disabled={selected.rated && !estaDentroDePeriodoCalificacion(selected.fechaFin?.toString() || "")}
-                        rows={4}
-                        maxLength={200} // <- Límite superior
->>>>>>> 95281ef808c427059d01109af9c1c7749de050fe
                       />
                     </div>
 
@@ -771,11 +722,7 @@ export function Tasklist({ hostId }: TasklistUsuario) {
 
                       {rating.comentario && (
                         <>
-<<<<<<< HEAD
                           <div className="comment-char-count">{rating.comentario.length} / 500 caracteres</div>
-=======
-                          <div className="comment-char-count">{rating.comentario.length} / 200 caracteres</div>
->>>>>>> 95281ef808c427059d01109af9c1c7749de050fe
 
                           {/* Validación del mínimo */}
                           {rating.comentario.length < 10 && (
@@ -783,15 +730,9 @@ export function Tasklist({ hostId }: TasklistUsuario) {
                           )}
 
                           {/* Filtro de lenguaje inapropiado */}
-<<<<<<< HEAD
                           {comentarioOfensivo && (
                             <div className="text-red-600 mt-1 font-medium">
                               Tu comentario contiene palabras ofensivas o no permitidas y no puede ser guardado.
-=======
-                          {rating.comentario !== getComentarioFiltrado() && (
-                            <div className="text-amber-600 mt-1">
-                              <span className="font-medium">Nota:</span> Tu comentario contiene palabras inapropiadas que serán filtradas al guardar.
->>>>>>> 95281ef808c427059d01109af9c1c7749de050fe
                             </div>
                           )}
                         </>
@@ -803,11 +744,7 @@ export function Tasklist({ hostId }: TasklistUsuario) {
                     {!selected.rated && estaDentroDePeriodoCalificacion(selected.fechaFin?.toString() || "") && (
                       <button
                         onClick={handleGuardar}
-<<<<<<< HEAD
                         disabled={!rating.comportamiento || !rating.cuidadoVehiculo || !rating.puntualidad || comentarioOfensivo}
-=======
-                        disabled={!rating.comportamiento || !rating.cuidadoVehiculo || !rating.puntualidad}
->>>>>>> 95281ef808c427059d01109af9c1c7749de050fe
                         className="save-rating-button"
                       >
                         Guardar calificación
