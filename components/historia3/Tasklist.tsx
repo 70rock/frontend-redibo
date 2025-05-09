@@ -2,6 +2,14 @@
 import { useEffect, useState } from "react"
 import { Trash2 } from "lucide-react"
 import "./styles.css"
+import leoProfanity from "leo-profanity"
+
+// Extender la definicion de tipos para leo-profanity
+declare module "leo-profanity" {
+  export function getDictionary(lang: string): string[]
+  export function add(words: string[]): void
+  export function clean(text: string): string
+}
 
 interface TasklistUsuario {
   hostId: string
@@ -17,7 +25,7 @@ interface Renter {
   rated?: boolean
   fechaFin?: Date
   idReserva?: string
-  
+  carImage?: string
 }
 
 interface Rental {
@@ -27,6 +35,9 @@ interface Rental {
   fechaFin: Date
   estado: string
   renter: Renter
+  car?: {
+    imagenes?: { url: string }[]
+  }
 }
 
 interface Calificacion {
@@ -39,13 +50,48 @@ interface Calificacion {
   fecha: Date
   renter: Renter
   reservaId?: string
+  hostPicture?: string
+  hostName?: string
 }
 
 export function Tasklist({ hostId }: TasklistUsuario) {
+  
+  useEffect(() => {
+    try {
+      // Cargar el diccionario en español
+      leoProfanity.add(leoProfanity.getDictionary("es"))
+      
+      // Agregar palabras adicionales al diccionario
+      leoProfanity.add([
+        "puta",
+        "mierda",
+        "cabrón",
+        "joder",
+        "coño",
+        "gilipollas",
+        "capullo",
+        "idiota",
+        "imbécil",
+        "pendejo",
+        "marica",
+        "maricón",
+        "cojones",
+        "hostia",
+        "hijo de puta",
+        "hijoputa",
+        "malparido",
+        "cabron",
+      ])
+    } catch (error) {
+      console.error("Error al cargar el diccionario:", error)
+    }
+  }, [])
+
   interface Rating {
     comportamiento: number
     cuidadoVehiculo: number
     puntualidad: number
+    comentario: string
   }
 
   const [renters, setRenters] = useState<Renter[]>([])
@@ -54,6 +100,7 @@ export function Tasklist({ hostId }: TasklistUsuario) {
     comportamiento: 0,
     cuidadoVehiculo: 0,
     puntualidad: 0,
+    comentario: "",
   })
   const [calificaciones, setCalificaciones] = useState<Calificacion[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -86,19 +133,24 @@ export function Tasklist({ hostId }: TasklistUsuario) {
         const ratingsData = await ratingsResponse.json()
         const calificacionesMapeadas = (ratingsData as any[]).map((c: any) => ({
           ...c,
-          reservaId: c.reservationId
+          reservaId: c.reservationId,
+          hostPicture: c.calificador?.image || "/placeholder.svg",
+          hostName: c.calificador?.nombre || "Anfitrión",
+          comentario: c.comment || c.comentario || "",
         }))
         setCalificaciones(calificacionesMapeadas)
 
         // Extraer renters únicos de las rentas
         const uniqueRenters = rentalsData.reduce((acc: Renter[], rental: Rental) => {
           const existingCalificacion = calificacionesMapeadas.find(c => c.reservaId === rental.id);
+          const carImage = rental.car?.imagenes?.[0]?.url || "/placeholder_car.svg";
           if (!acc.find(r => r.id === rental.renter.id && r.idReserva === rental.id)) {
             acc.push({
               ...rental.renter,
               idReserva: rental.id,
               fechaFin: rental.fechaFin,
-              rated: !!existingCalificacion
+              rated: !!existingCalificacion,
+              carImage
             })
           }
           return acc
@@ -139,12 +191,14 @@ export function Tasklist({ hostId }: TasklistUsuario) {
           comportamiento: calificacion.comportamiento,
           cuidadoVehiculo: calificacion.cuidadoVehiculo,
           puntualidad: calificacion.puntualidad,
+          comentario: calificacion.comentario,
         })
       } else {
         setRating({
           comportamiento: 0,
           cuidadoVehiculo: 0,
           puntualidad: 0,
+          comentario: "",
         })
       }
 
@@ -162,14 +216,16 @@ export function Tasklist({ hostId }: TasklistUsuario) {
       return
     }
     try {
-      // Calcular el rating general como promedio de los tres ratings
       const ratingGeneral = Math.round((rating.comportamiento + rating.cuidadoVehiculo + rating.puntualidad) / 3)
+
+      // Filtrar el comentario para eliminar palabras inapropiadas
+      const comentarioLimpio = leoProfanity.clean(rating.comentario)
 
       const ratingData = {
         comportamiento: rating.comportamiento,
         cuidadoVehiculo: rating.cuidadoVehiculo,
         puntualidad: rating.puntualidad,
-        comentario: '', // Puedes agregar un campo de comentario si lo tienes en el formulario
+        comentario: comentarioLimpio,
         reservationId: selected.idReserva,
         calificadorId: hostId,
         calificadoId: selected.id,
@@ -218,6 +274,7 @@ export function Tasklist({ hostId }: TasklistUsuario) {
                       comportamiento: updatedRating.behaviorRating,
                       cuidadoVehiculo: updatedRating.carCareRating,
                       puntualidad: updatedRating.punctualityRating,
+                      comentario: updatedRating.comment,
                     }
                   : c,
               )
@@ -297,6 +354,10 @@ export function Tasklist({ hostId }: TasklistUsuario) {
     return categoriasPuntuadas > 0 ? Math.round((suma / categoriasPuntuadas) * 10) / 10 : 0
   }
 
+  function getComentarioFiltrado() {
+    return leoProfanity.clean(rating.comentario)
+  }
+
   function formatDate(dateString: string) {
     const date = new Date(dateString)
     const day = date.getDate()
@@ -361,11 +422,24 @@ export function Tasklist({ hostId }: TasklistUsuario) {
                   {Array.isArray(renters) && renters.length > 0 ? (
                     renters.map((renter) => {
                       const calificacion = calificaciones.find(c => c.reservaId === renter.idReserva)
+                      const carImage = renter.carImage || "/placeholder_car.svg";
                       return (
                         <div key={renter.id} className="rental-item">
                           <div className="rental-item-left">
-                            <div className="rental-image-placeholder"></div>
-                            <div className="rental-user-avatar"></div>
+                            <div className="rental-image-placeholder">
+                              <img
+                                src={renter.carImage || "/placeholder_car.svg"}
+                                alt="Imagen del auto"
+                                style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 4 }}
+                              />
+                            </div>
+                            <div className="rental-user-avatar">
+                              <img
+                                src={renter.profilePicture || "/placeholder.svg"}
+                                alt={`${renter.firstName} ${renter.lastName}`}
+                                style={{ width: 40, height: 40, borderRadius: "50%" }}
+                              />
+                            </div>
                             <div className="rental-user-info">
                               <div className="rental-user-name">{renter.firstName} {renter.lastName}</div>
                               <div className="rental-car-info">
@@ -392,6 +466,11 @@ export function Tasklist({ hostId }: TasklistUsuario) {
                                         (calificacion.comportamiento + calificacion.cuidadoVehiculo + calificacion.puntualidad) / 3
                                       ).toFixed(1)})
                                     </span>
+                                    {calificacion.comentario && (
+                                      <span className="has-comment-indicator" title="Tiene comentario">
+                                        💬
+                                      </span>
+                                    )}
                                   </div>
                                 ) : (
                                   <span>Sin calificar</span>
@@ -485,7 +564,13 @@ export function Tasklist({ hostId }: TasklistUsuario) {
                   </div>
 
                   <div className="rating-car-details">
-                    <div className="rating-car-image-placeholder"></div>
+                    <div className="rental-image-placeholder">
+                      <img
+                        src={selected?.carImage || "/placeholder_car.svg"}
+                        alt="Imagen del auto"
+                        style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 4 }}
+                      />
+                    </div>
                     <div className="rating-car-info">
                       <div className="rating-car-model">
                         {selected.firstName} {selected.lastName}
@@ -608,6 +693,51 @@ export function Tasklist({ hostId }: TasklistUsuario) {
                       </div>
                     </div>
                   </div>
+
+                  {/* Añadir después de la última categoría (puntualidad) y antes de los botones de acción */}
+                  <div className="rating-category">
+                      <h4 className="mb-2 font-medium text-gray-700">Comentario general</h4>
+                      <textarea
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400"
+                        placeholder="Añade un comentario general sobre tu experiencia con este arrendatario..."
+                        value={rating.comentario}
+                        onChange={(e) => {
+                          console.log("Comentario actualizado:", e.target.value)
+                          setRating((prev) => ({ ...prev, comentario: e.target.value }))
+                        }}
+                        disabled={selected.rated && !estaDentroDePeriodoCalificacion(selected.fechaFin?.toString() || "")}
+                        rows={4}
+                        maxLength={200} // <- Límite superior
+                      />
+                    </div>
+
+                    {/* NUEVO CONTENEDOR PARA MENSAJES DE VALIDACIÓN */}
+                    <div className="mt-2 text-sm text-gray-500">
+                      {!rating.comentario && (
+                        <div className="comment-feedback">
+                          Puedes añadir un comentario sobre tu experiencia con este arrendatario
+                        </div>
+                      )}
+
+                      {rating.comentario && (
+                        <>
+                          <div className="comment-char-count">{rating.comentario.length} / 200 caracteres</div>
+
+                          {/* Validación del mínimo */}
+                          {rating.comentario.length < 10 && (
+                            <div className="text-red-600 mt-1">El comentario debe tener al menos 10 caracteres.</div>
+                          )}
+
+                          {/* Filtro de lenguaje inapropiado */}
+                          {rating.comentario !== getComentarioFiltrado() && (
+                            <div className="text-amber-600 mt-1">
+                              <span className="font-medium">Nota:</span> Tu comentario contiene palabras inapropiadas que serán filtradas al guardar.
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+
 
                   <div className="rating-actions">
                     {!selected.rated && estaDentroDePeriodoCalificacion(selected.fechaFin?.toString() || "") && (

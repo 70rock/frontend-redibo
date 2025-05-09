@@ -41,9 +41,39 @@ export default function RenterDetails({ renterId }: RenterDetailsProps) {
         }
 
         const data = await getRenterDetails(finalRenterId)
-        setRenterDetails(data)
-
         const calificaciones = await getCalificaciones(finalRenterId)
+
+        // Convertir calificaciones a formato de reseñas
+        const calificacionesAsReviews = calificaciones.map((c: any) => {
+          console.log("calificador recibido:", c.calificador);
+          return {
+            id: c.id,
+            renterId: c.calificadoId,
+            hostId: c.calificadorId,
+            reservationId: c.reservationId,
+            rating: (c.comportamiento + c.cuidadoVehiculo + c.puntualidad) / 3,
+            behaviorRating: c.comportamiento,
+            carCareRating: c.cuidadoVehiculo,
+            punctualityRating: c.puntualidad,
+            comment: c.comentario,
+            hostName: c.calificador?.nombre || "Anfitrión",
+            hostPicture: c.calificador?.image || undefined,
+            renterName: `${data.firstName} ${data.lastName}`,
+            createdAt: c.fechaCreacion ? new Date(c.fechaCreacion) : null,
+            updatedAt: new Date(c.updatedAt),
+            date: c.fechaCreacion ? new Date(c.fechaCreacion).toLocaleDateString() : ""
+          }
+        })
+
+        // Combinar reseñas existentes con calificaciones
+        const allReviews = [...(data.reviews || []), ...calificacionesAsReviews]
+
+        setRenterDetails({
+          ...data,
+          reviews: allReviews,
+          reviewCount: allReviews.length
+        })
+
         if (calificaciones.length > 0) {
           const sum = calificaciones.reduce(
             (acc: number, c: { comportamiento: number; cuidadoVehiculo: number; puntualidad: number }) => 
@@ -301,7 +331,9 @@ export default function RenterDetails({ renterId }: RenterDetailsProps) {
                           <div className="flex justify-between items-start">
                             <div>
                               <h4 className="font-medium">{rental.car_model}</h4>
-                              <p className="text-sm text-muted-foreground">{rental.dates}</p>
+                              <span className="text-sm text-muted-foreground">
+                                {rental.dates}
+                              </span>
                             </div>
                             <Badge variant={rental.status === "Completado" ? "default" : "secondary"}>
                               {rental.status}

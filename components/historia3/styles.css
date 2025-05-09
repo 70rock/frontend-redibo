@@ -129,8 +129,9 @@
 
 .calificar-button {
   padding: 8px 16px;
-  background-color: white;
-  border: 1px solid #e5e7eb;
+  background-color: rgb(0, 0, 0);
+  color: white;
+  border: 1px solid #000000;
   border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
@@ -139,13 +140,17 @@
 }
 
 .calificar-button:hover {
-  background-color: #f9fafb;
+  background-color: #fcfcfc;
+  color: rgb(0, 0, 0);
+  border: 1px solid #000000;
 }
 
 .calificar-button.rated {
-  background-color: #f3f4f6;
+  background-color: #000000;
 }
-
+.calificar-button.rated:hover {
+  background-color: #f4f4f4;
+}
 .calificar-button.disabled {
   background-color: #f3f4f6;
   color: #9ca3af;
@@ -162,16 +167,19 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  background-color: #fee2e2;
+  background-color: #000000;
   border: none;
   border-radius: 6px;
-  color: #1d0564;
+  color: #ffffff;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .delete-button:hover {
-  background-color: #fecaca;
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #000000;
+  
 }
 
 .empty-rating-panel,
@@ -335,11 +343,20 @@
   border-bottom: 1px solid #e5e7eb;
 }
 
+.rating-category:last-child {
+  margin-bottom: 0;
+}
+
 .rating-category-label {
   display: flex;
   flex-direction: column;
   gap: 4px;
   font-weight: 500;
+}
+
+.rating-category-label span:first-child {
+  font-weight: 500;
+  color: #111827;
 }
 
 .rating-category-question {
@@ -355,6 +372,16 @@
 
 .star-icon-medium {
   font-size: 24px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.star-icon-medium:hover {
+  color: #facc15;
+}
+
+.star-icon-medium.active {
+  color: #facc15;
 }
 
 .rating-actions {
@@ -365,8 +392,9 @@
 
 .save-rating-button {
   padding: 10px 16px;
-  background-color: #032369;
+  background-color: #000000;
   color: white;
+  border: 1px solid #000000;
   border: none;
   border-radius: 6px;
   font-weight: 500;
@@ -375,11 +403,14 @@
 }
 
 .save-rating-button:hover {
-  background-color: #07095b;
+  background-color: #ffffff;
+  color: rgb(0, 0, 0);
+  border: 1px solid #000000;
 }
 
 .save-rating-button:disabled {
-  background-color: #d1d5db;
+  background-color: #8c8d8f;
+  color: white;
   cursor: not-allowed;
 }
 
@@ -403,8 +434,9 @@
 
 .close-rating-button {
   padding: 10px 16px;
-  background-color: white;
-  border: 1px solid #e5e7eb;
+  background-color: rgb(0, 0, 0);
+  color: white;
+  border: 1px solid #000000;
   border-radius: 6px;
   font-weight: 500;
   margin-left: auto;
@@ -414,10 +446,68 @@
 
 .close-rating-button:hover {
   background-color: #f9fafb;
+  color: rgb(0, 0, 0);
+  border: 1px solid #000000;
 }
 
 .no-rentals {
   padding: 20px;
   text-align: center;
   color: #6b7280;
+}
+
+/* Estilos para el área de comentarios */
+.comment-area {
+  margin-top: 24px;
+  padding: 16px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+}
+
+.comment-area textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 14px;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.comment-area textarea:focus {
+  outline: none;
+  border-color: #000000;
+}
+
+.comment-area textarea:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.comment-feedback {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.comment-char-count {
+  font-size: 12px;
+  color: #6b7280;
+  text-align: right;
+  margin-top: 4px;
+}
+
+/* Estilos para mensajes de validación */
+.validation-message {
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.validation-message.error {
+  color: #dc2626;
+}
+
+.validation-message.warning {
+  color: #d97706;
 }

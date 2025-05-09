@@ -155,3 +155,13 @@ export function getCalificaciones(calificadoId: string) {
 export function getFirstRenterId() {
   return api.get("/api/renter-details/first")
 }
+
+// Obtener comentarios de un auto específico
+export function getCarComments(carId: string) {
+  return api.get(`/api/car-comments?carId=${carId}`)
+}
+
+// Crear un comentario para un auto
+export function createCarComment(commentData: any) {
+  return api.post("/api/car-comments", commentData)
+}
