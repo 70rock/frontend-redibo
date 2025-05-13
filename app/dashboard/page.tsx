@@ -307,7 +307,7 @@ export default function ComentariosPage() {
                     </span>
                   </div>
                   <div className="mt-1">{renderStars(comment.rating)}</div>
-                  <p className="mt-2 text-gray-700">{comment.comment || "Sin comentarios"}</p>
+                  <p className="mt-2 text-gray- break-words whitespace-pre-line">{comment.comment || "Sin comentarios"}</p>
                   <p className="mt-1 text-sm text-gray-500">
                     Por: {comment.renter.firstName} {comment.renter.lastName}
                   </p>

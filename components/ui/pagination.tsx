@@ -26,12 +26,14 @@ const PaginationItem = React.forwardRef<HTMLLIElement, React.ComponentProps<"li"
 ))
 PaginationItem.displayName = "PaginationItem"
 
+// Extendemos el tipo PaginationLinkProps para incluir 'disabled'
 type PaginationLinkProps = {
   isActive?: boolean
+  disabled?: boolean // Agregamos la propiedad disabled aquí
 } & Pick<ButtonProps, "size"> &
   React.ComponentProps<"a">
 
-const PaginationLink = ({ className, isActive, size = "icon", ...props }: PaginationLinkProps) => (
+const PaginationLink = ({ className, isActive, size = "icon", disabled, ...props }: PaginationLinkProps) => (
   <a
     aria-current={isActive ? "page" : undefined}
     className={cn(
@@ -39,8 +41,16 @@ const PaginationLink = ({ className, isActive, size = "icon", ...props }: Pagina
         variant: isActive ? "outline" : "ghost",
         size,
       }),
+      disabled ? "opacity-50 cursor-not-allowed" : "", // Estilo para deshabilitar el botón
       className,
     )}
+    onClick={(e) => {
+      if (disabled) {
+        e.preventDefault() // Prevenir la acción si el botón está deshabilitado
+      } else {
+        props.onClick?.(e) // Llamar al onClick original si no está deshabilitado
+      }
+    }}
     {...props}
   />
 )
@@ -54,8 +64,22 @@ const PaginationPrevious = ({ className, ...props }: React.ComponentProps<typeof
 )
 PaginationPrevious.displayName = "PaginationPrevious"
 
-const PaginationNext = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink aria-label="Go to next page" size="default" className={cn("gap-1 pr-2.5", className)} {...props}>
+// Ahora 'PaginationNext' acepta correctamente la propiedad 'disabled'
+const PaginationNext = ({ className, disabled, ...props }: React.ComponentProps<typeof PaginationLink> & { disabled?: boolean }) => (
+  <PaginationLink
+    aria-label="Go to next page"
+    size="default"
+    className={cn("gap-1 pr-2.5", disabled ? "opacity-50 cursor-not-allowed" : "", className)}
+    onClick={(e) => {
+      if (disabled) {
+        e.preventDefault() // Prevenir la acción si el botón está deshabilitado
+      } else {
+        props.onClick?.(e) // Llamar al onClick original si no está deshabilitado
+      }
+    }}
+    disabled={disabled} // Pasar la propiedad disabled aquí
+    {...props}
+  >
     <span>Next</span>
     <ChevronRight className="h-4 w-4" />
   </PaginationLink>
