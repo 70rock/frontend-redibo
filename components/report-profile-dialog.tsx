@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
+import { createReport } from "@/lib/api"
 
 interface ReportProfileDialogProps {
   children: React.ReactNode
@@ -44,16 +45,21 @@ export default function ReportProfileDialog({ children, renterId, renterName }: 
     setIsSubmitting(true)
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await createReport({
+        renterId,
+        renterName,
+        reason,
+        additionalInfo,
+      });
 
       toast({
         title: "Reporte enviado",
         description: "Su reporte ha sido enviado correctamente y será revisado por nuestro equipo.",
-      })
+      });
 
-      setReason("")
-      setAdditionalInfo("")
-      setIsOpen(false)
+      setReason("");
+      setAdditionalInfo("");
+      setIsOpen(false);
     } catch (error) {
       console.error("Error submitting report:", error)
       toast({

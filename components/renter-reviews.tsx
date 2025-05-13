@@ -16,12 +16,26 @@ interface RenterReviewsProps {
 type SortOrder = "newest" | "oldest"
 type RatingFilter = "all" | "5" | "4" | "3" | "2" | "1"
 
+function tiempoTranscurrido(fecha: string | Date) {
+  const ahora = new Date();
+  const fechaResena = new Date(fecha);
+  const diff = (ahora.getTime() - fechaResena.getTime()) / 1000; // en segundos
+
+  if (diff < 60) return "ahora mismo";
+  if (diff < 3600) return `hace ${Math.floor(diff / 60)} minuto${Math.floor(diff / 60) === 1 ? "" : "s"}`;
+  if (diff < 86400) return `hace ${Math.floor(diff / 3600)} hora${Math.floor(diff / 3600) === 1 ? "" : "s"}`;
+  if (diff < 604800) return `hace ${Math.floor(diff / 86400)} día${Math.floor(diff / 86400) === 1 ? "" : "s"}`;
+  if (diff < 2592000) return `hace ${Math.floor(diff / 604800)} semana${Math.floor(diff / 604800) === 1 ? "" : "s"}`;
+  return fechaResena.toLocaleDateString();
+}
+
 export default function RenterReviews({ reviews }: RenterReviewsProps) {
   const [expanded, setExpanded] = useState(false)
   const [sortOrder, setSortOrder] = useState<SortOrder>("newest")
   const [ratingFilter, setRatingFilter] = useState<RatingFilter>("all")
   const [showFilters, setShowFilters] = useState(false)
   const initialReviewsCount = 2
+  const [expandedComment, setExpandedComment] = useState<number | null>(null)
 
   console.log("reviews recibidas:", reviews);
   console.log("calificador recibido:", null);
@@ -151,6 +165,9 @@ export default function RenterReviews({ reviews }: RenterReviewsProps) {
           {displayedReviews.map((review, index) => {
             // Usar rating como valor de estrellas
             const promedio = review.rating || 0;
+            const comentarioTexto = review.comment || "";
+            const comentarioLargo = comentarioTexto.length > 120;
+            const mostrarExpandido = expandedComment === index;
 
             return (
               <div key={review.id || index}>
@@ -166,7 +183,7 @@ export default function RenterReviews({ reviews }: RenterReviewsProps) {
                       <h4 className="font-medium">{review.hostName || "Anfitrión"}</h4>
                       <span className="text-sm text-muted-foreground">
                         {review.createdAt
-                          ? new Date(review.createdAt).toLocaleDateString()
+                          ? tiempoTranscurrido(review.createdAt)
                           : ""}
                       </span>
                     </div>
@@ -179,7 +196,15 @@ export default function RenterReviews({ reviews }: RenterReviewsProps) {
                       ))}
                       <span className="ml-2 text-xs text-muted-foreground">({promedio.toFixed(1)})</span>
                     </div>
-                    <p className="text-sm">{review.comment || "Sin comentarios"}</p>
+                    <p
+                      className="text-sm cursor-pointer select-none"
+                      onClick={() => setExpandedComment(mostrarExpandido ? null : index)}
+                      title={comentarioLargo ? (mostrarExpandido ? "Ocultar comentario" : "Ver comentario completo") : undefined}
+                    >
+                      {comentarioLargo && !mostrarExpandido
+                        ? `${comentarioTexto.slice(0, 120)}...`
+                        : comentarioTexto || "Sin comentarios"}
+                    </p>
                   </div>
                 </div>
                 {index < displayedReviews.length - 1 && <Separator className="my-4" />}

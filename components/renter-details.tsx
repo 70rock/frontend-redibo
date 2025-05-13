@@ -170,7 +170,7 @@ export default function RenterDetails({ renterId }: RenterDetailsProps) {
               <div className="p-6 flex flex-col items-center text-center">
                 {/* Avatar */}
                 <Avatar className="h-24 w-24 mb-4">
-                  <AvatarImage src={renterDetails.profilePicture || "/placeholder.svg"} alt={renterDetails.firstName} />
+                  <AvatarImage src={renterDetails.profilePicture || "/placeholder.svg"} alt={renterDetails.firstName} className="object-cover" />
                   <AvatarFallback className="bg-gray-200">{`${renterDetails.firstName.charAt(0)}${renterDetails.lastName.charAt(0)}`}</AvatarFallback>
                 </Avatar>
 
